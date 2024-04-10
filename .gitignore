@@ -1,0 +1,10 @@
+# python
+.venv
+__pycache__
+
+# dot env file
+.env
+.env.local*
+
+# ide
+.vscode

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/pyright/main/packages/vscode-pyright/schemas/pyrightconfig.schema.json",
+  "include": ["app", "tests"],
+  "pythonVersion": "3.12",
+  "pythonPlatform": "All",
+  "reportMissingImports": true,
+  "reportUnusedImport": "warning",
+  "venvPath": ".",
+  "venv": ".venv"
+}
