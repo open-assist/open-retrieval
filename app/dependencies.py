@@ -37,6 +37,10 @@ async def get_org_header(
         )
 
 
+def get_index_name(org: str, file_id: str):
+    return f"{org}-{file_id.lower()}"
+
+
 def get_file_path(org: str, file_id: str):
     """
     Generate a file path for a file in the organization's data directory.

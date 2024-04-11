@@ -23,6 +23,7 @@ from ..models.file import (
 from ..dependencies import (
     authenticate,
     get_file_path,
+    get_index_name,
     get_job_file_path,
     get_org_header,
     parse_mime_type,
@@ -56,18 +57,18 @@ def _convert_to_file_document(doc: Document):
     )
 
 
-@router.post("/{file_name}/job")
+@router.post("/{file_id}/job")
 async def create_file_job(
     x_retrieval_organization: Annotated[str, Header()],
-    file_name: Annotated[str, Path(description="The ID of file to get documents")],
+    file_id: Annotated[str, Path(description="The ID of file to get documents")],
     req: CreateFileJonRequest,
     tasks: BackgroundTasks,
 ):
-    file_path = get_file_path(x_retrieval_organization, file_name)
+    file_path = get_file_path(x_retrieval_organization, req.file_name)
     if not file_path.exists():
         raise HTTPException(status_code=404)
 
-    job_file_path = get_job_file_path(x_retrieval_organization, file_name)
+    job_file_path = get_job_file_path(x_retrieval_organization, file_id)
     if job_file_path.exists():
         raise HTTPException(status_code=409)
 
@@ -78,23 +79,26 @@ async def create_file_job(
     job_file_path.touch()
     job_file_path.write_text(job.model_dump_json())
 
-    file_type = parse_mime_type(file_name)
+    file_type = parse_mime_type(req.file_name)
     file_type = req.file_type if file_type is None else file_type
     if not file_type:
         file_type = req.file_type
-    vector_store = await get_vector_store(f"{x_retrieval_organization}-{file_name}")
     tasks.add_task(
-        index_file, x_retrieval_organization, file_name, file_type, vector_store
+        index_file,
+        x_retrieval_organization,
+        file_id,
+        req.file_name,
+        file_type,
     )
     return job
 
 
-@router.get("/{file_name}/job")
+@router.get("/{file_id}/job")
 async def get_file_job(
     x_retrieval_organization: Annotated[str, Header()],
-    file_name: Annotated[str, Path(description="The ID of file to get documents")],
+    file_id: Annotated[str, Path(description="The ID of file to get documents")],
 ):
-    file_path = get_job_file_path(x_retrieval_organization, file_name)
+    file_path = get_job_file_path(x_retrieval_organization, file_id)
     if not file_path.exists():
         raise HTTPException(status_code=404)
 
@@ -121,10 +125,10 @@ async def search_files(
 ) -> List[SearchResult]:
     # file name -> index name
     index_names = list(
-        map(lambda name: f"{x_retrieval_organization}-{name}", req.file_names)
+        map(lambda id: get_index_name(x_retrieval_organization, id), req.file_ids)
     )
     # index name -> vector store index
-    indexes = await asyncio.gather(*list(map(get_vector_store_index, index_names)))
+    indexes = list(map(get_vector_store_index, index_names))
     # index -> retriever
     retrievers = list(map(lambda idx: idx.as_retriever(), indexes))
     # each retriever retreves input

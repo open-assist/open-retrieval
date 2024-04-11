@@ -9,7 +9,7 @@ class FileDocument(BaseModel):
 
 
 class SearchFilesRequest(BaseModel):
-    file_names: list[str] = Field(
+    file_ids: list[str] = Field(
         description="The ID of files which which are to search.",
         min_length=1,
         max_length=10,
@@ -44,4 +44,5 @@ class FileJob(BaseModel):
 
 
 class CreateFileJonRequest(BaseModel):
+    file_name: str = Field(description="The name of file.")
     file_type: str = Field(description="The mime type of file.")

@@ -11,8 +11,9 @@ from llama_index.core.schema import Document
 from llama_index.core.vector_stores.types import BasePydanticVectorStore
 from typing import List
 
-from ..dependencies import get_file_path, get_job_file_path, logger
+from ..dependencies import get_file_path, get_index_name, get_job_file_path, logger
 from ..models.file import FileJobStatus
+from ..providers.vector_store.factory import get_vector_store, get_vector_store_index
 
 
 def _calc_tokens(documents: List[Document]):
@@ -101,7 +102,10 @@ def _get_node_parser(file_type: str):
 
 
 def index_file(
-    org: str, file_name: str, file_type: str, vector_store: BasePydanticVectorStore
+    org: str,
+    file_id: str,
+    file_name: str,
+    file_type: str,
 ):
     """
     Index a file and store it in a vector database.
@@ -111,7 +115,8 @@ def index_file(
         file_name (str): The file name.
         file_type (str): The MIME type of the file.
     """
-    job_file = get_job_file_path(org, file_name)
+    logger.info(f"[{__name__}] indexing file({org}/{file_name}) was started")
+    job_file = get_job_file_path(org, file_id)
     job_dict = json.loads(job_file.read_text())
 
     job_dict["status"] = FileJobStatus.RUNNING.value
@@ -123,17 +128,19 @@ def index_file(
         tokens = _calc_tokens(documents)
         job_dict["tokens"] = tokens
 
+        vector_store = get_vector_store(get_index_name(org, file_id))
         node_parser = _get_node_parser(file_type)
         pipeline = IngestionPipeline(
-            transformations=[node_parser],
+            transformations=[node_parser, Settings.embed_model],
             vector_store=vector_store,
         )
         pipeline.run(documents=documents)
     except Exception as e:
-        logger.error(f"[{__name__}] {e}")
+        logger.error(f"[{__name__}] indexing file({org}/{file_name}) with error: {e}")
         job_dict["status"] = FileJobStatus.FAILED.value
     else:
         job_dict["status"] = FileJobStatus.SUCCEEDED.value
     finally:
+        logger.info(f"[{__name__}] indexing file({org}/{file_name}) end")
         job_dict["finished_at"] = math.floor(time.time())
         job_file.write_text(json.dumps(job_dict))
