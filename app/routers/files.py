@@ -29,7 +29,7 @@ from ..dependencies import (
     parse_mime_type,
 )
 from ..tasks.index import index_file
-from ..providers.vector_store.factory import get_vector_store, get_vector_store_index
+from ..providers.vector_store.factory import get_vector_store_index
 
 router = APIRouter(
     prefix="/files",

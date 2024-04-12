@@ -8,12 +8,11 @@ from llama_index.core import SimpleDirectoryReader
 from llama_index.core.ingestion import IngestionPipeline
 from llama_index.core.node_parser import CodeSplitter, SemanticSplitterNodeParser
 from llama_index.core.schema import Document
-from llama_index.core.vector_stores.types import BasePydanticVectorStore
 from typing import List
 
 from ..dependencies import get_file_path, get_index_name, get_job_file_path, logger
 from ..models.file import FileJobStatus
-from ..providers.vector_store.factory import get_vector_store, get_vector_store_index
+from ..providers.vector_store.factory import get_vector_store
 
 
 def _calc_tokens(documents: List[Document]):
