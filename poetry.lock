@@ -762,6 +762,20 @@ postgres = ["asyncpg (>=0.29.0,<0.30.0)", "pgvector (>=0.2.4,<0.3.0)", "psycopg2
 query-tools = ["guidance (>=0.0.64,<0.0.65)", "jsonpath-ng (>=1.6.0,<2.0.0)", "lm-format-enforcer (>=0.4.3,<0.5.0)", "rank-bm25 (>=0.2.2,<0.3.0)", "scikit-learn", "spacy (>=3.7.1,<4.0.0)"]
 
 [[package]]
+name = "llama-index-embeddings-ollama"
+version = "0.1.2"
+description = "llama-index embeddings ollama integration"
+optional = false
+python-versions = ">=3.8.1,<4.0"
+files = [
+    {file = "llama_index_embeddings_ollama-0.1.2-py3-none-any.whl", hash = "sha256:ac7afabfa1134059af351b021e05e256bf86dd15e5176ffa5ab0305bcf03b33f"},
+    {file = "llama_index_embeddings_ollama-0.1.2.tar.gz", hash = "sha256:a9e0809bddd2e4ad888f249519edc7e3d339c74e4e03fc5a40c3060dc41d47a9"},
+]
+
+[package.dependencies]
+llama-index-core = ">=0.10.1,<0.11.0"
+
+[[package]]
 name = "llama-index-embeddings-voyageai"
 version = "0.1.4"
 description = "llama-index embeddings voyageai integration"
@@ -2527,4 +2541,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.12,<3.13"
-content-hash = "5a79b8138d5662f2d1ea70d502288db6d50fd8d273ac4c16df49326d22c3cd58"
+content-hash = "b1c11ea8e34b68d8d8c85a01a7ffe71f78f808d2c7e43e37a831cd8e9d3b9f41"

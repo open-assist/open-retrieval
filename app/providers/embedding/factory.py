@@ -14,8 +14,12 @@ def set_embed_model():
     """
     match (embedding):
         case "voyage":
-            from .voyage import get_embed_model
+            from .voyage import get_voyage_embed_model
 
-            Settings.embed_model = get_embed_model()
+            Settings.embed_model = get_voyage_embed_model()
+        case "ollama":
+            from .ollama import get_ollama_embed_model
+
+            Settings.embed_model = get_ollama_embed_model()
         case _:
             raise ValueError(f"Unsupported embedding: {embedding}")
