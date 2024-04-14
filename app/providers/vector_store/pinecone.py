@@ -3,6 +3,13 @@ from pinecone import Pinecone, PodSpec, ServerlessSpec
 from llama_index.vector_stores.pinecone import PineconeVectorStore
 
 
+def _get_pinecone():
+    PINECONE_API_KEY = os.environ.get("PINECONE_API_KEY")
+    assert PINECONE_API_KEY is not None
+
+    return Pinecone(api_key=PINECONE_API_KEY)
+
+
 def get_pinecone_vector_store(index_name: str, create: bool = True):
     """Create a Pinecone vector store.
 
@@ -41,3 +48,13 @@ def get_pinecone_vector_store(index_name: str, create: bool = True):
     return PineconeVectorStore(
         pc.Index(index_name),
     )
+
+
+def delete_pinecone_index(index_name: str):
+    """Delete a Pinecone index.
+
+    Args:
+        index_name (str): The name of the Pinecone index to delete.
+    """
+    pc = _get_pinecone()
+    pc.delete_index(index_name)

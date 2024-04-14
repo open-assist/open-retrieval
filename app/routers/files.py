@@ -29,7 +29,7 @@ from ..dependencies import (
     parse_mime_type,
 )
 from ..tasks.index import index_file
-from ..providers.vector_store.factory import get_vector_store_index
+from ..providers.vector_store.factory import get_vector_store_index, delete_index
 
 router = APIRouter(
     prefix="/files",
@@ -108,7 +108,7 @@ async def get_file_job(
 @router.get("/{file_name}/documents")
 async def get_file_documents(
     x_retrieval_organization: Annotated[str, Header()],
-    file_name: Annotated[str, Path(description="The ID of file to get documents")],
+    file_name: Annotated[str, Path(description="The name of file to get documents")],
 ) -> List[FileDocument]:
     file_path = get_file_path(x_retrieval_organization, file_name)
     if not file_path.exists():
@@ -145,3 +145,12 @@ async def search_files(
             nodes,
         )
     )
+
+
+@router.delete("/{file_id}/index", status_code=204)
+async def delete_file_index(
+    x_retrieval_organization: Annotated[str, Header()],
+    file_id: Annotated[str, Path(description="The ID of file to get documents")],
+):
+    index_name = get_index_name(x_retrieval_organization, file_id)
+    delete_index(index_name)
