@@ -2,6 +2,7 @@ import os
 from llama_index.core import VectorStoreIndex
 from ...dependencies import logger
 from .pinecone import get_pinecone_vector_store, delete_pinecone_index
+from .postgres import get_postgres_vector_store
 
 
 def _get_vector_store_name():
@@ -24,11 +25,13 @@ def get_vector_store(index_name: str, create: bool = True):
     """
     logger.info(f"[{__name__}] index name: {index_name}")
 
-    vector_store = _get_vector_store_name
+    vector_store = _get_vector_store_name()
 
     match vector_store:
         case "pinecone":
             return get_pinecone_vector_store(index_name, create)
+        case "postgres":
+            return get_postgres_vector_store(index_name, create)
         case _:
             raise ValueError(f"Unsupported vector store: {vector_store}")
 
@@ -60,5 +63,7 @@ def delete_index(index_name: str):
     match vector_store:
         case "pinecone":
             return delete_pinecone_index(index_name)
+        case "postgres":
+            return
         case _:
             raise ValueError(f"Unsupported vector store: {vector_store}")
